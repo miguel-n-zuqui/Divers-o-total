@@ -1,0 +1,73 @@
+﻿@page "/carteirinha"
+@using Frontend.Model.Request
+@using Frontend.Model.Response
+
+<h3>Carteirinha</h3>
+
+<EditForm Model="_clienteRequest" OnValidSubmit="GerarCarteirinha">
+    <DataAnnotationsValidator/>
+    <div class="row">
+        <div class="col-4">
+            <label>Nome do cliente</label>
+            <InputText @bind-Value="_clienteRequest.Nome" class="form-control"/>
+            <ValidationMessage For="() => _clienteRequest.Nome"/>
+        </div>
+        <div class="col-4">
+            <label>Data de nascimento</label>
+            <InputDate @bind-Value="_clienteRequest.Nascimento" class="form-control" />
+            <ValidationMessage For="() => _clienteRequest.Nascimento"/>
+        </div>
+        <div class="col-2">
+            <button type="submit" class="btn btn-outline-primary mt-2">Gerar carteirinha</button>
+        </div>
+    </div>
+</EditForm>
+
+@if (exibirCarteira)
+{
+    <div class="row mt-4 p-5">
+        <div class="col-md-12">
+            <div class="h-100 text-center p-5 rounded-3"
+                 style="background:@_carteirinhaResponse.CorDeFundo">
+
+                <h2>@_carteirinhaResponse.Nome</h2>
+                <h5>
+                    <span>@_carteirinhaResponse.Nascimento.ToShortDateString()</span>
+                </h5>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private ClienteRequest _clienteRequest { get; set; } = new();
+    private CarteirinhaResponse _carteirinhaResponse { get; set; } = new();
+    private bool exibirCarteira = false;
+
+    private async Task GerarCarteirinha()
+    {
+        //lembre de sempre alterar a url da api para a url, use swagger para verificar a url
+        var apiUrl = $"https://localhost:7157/carteirinha/obter?nome={_clienteRequest.Nome}&nascimento={_clienteRequest.Nascimento.ToShortDateString()}";
+        var http = new HttpClient();
+
+        try
+        {
+            //faça um httpget para a api passando o nome e a data de nascimento o retorno é um objeto do tipo CarteirinhaResponse
+            _carteirinhaResponse = await http.GetFromJsonAsync<CarteirinhaResponse>(apiUrl);
+
+            //Verifica se existe um valor para a cor de fundo, se existir exibe a carteirinha
+            if (!string.IsNullOrEmpty(_carteirinhaResponse.CorDeFundo))
+            {
+                exibirCarteira = true;    
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+
+        
+    }
+}
