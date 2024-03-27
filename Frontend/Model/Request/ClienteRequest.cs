@@ -2,6 +2,8 @@
 
 namespace Frontend.Model.Request
 {
+    //quando o elemento for REQUEST quer dizer que é oque o sistema ira RECEBER, ou seja são os itens que irao aparecer na tela 
+    //lembrando que a pasta MODELL no front e no back tem que ser tudo igual nome e etc
     public class ClienteRequest
     {
         [Required (ErrorMessage = "Nome é obrigatório")]
